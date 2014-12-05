@@ -975,7 +975,15 @@ PCRE regexp features that cannot be translated into Emacs syntax
 will cause an error. See the commentary section of pcre2el.el for
 more details."
   (interactive (rxt-interactive/pcre))
-  (rxt-value emacs (rx-to-string (rxt-pcre-to-rx pcre flags) t)))
+  (let ((separator (when (and (boundp query-replace-from-to-separator)
+                              query-replace-from-to-separator)
+                     (propertize "\0"
+                                 'display query-replace-from-to-separator
+                                 'separator t)))
+        (elisp (rxt-value emacs (rx-to-string (rxt-pcre-to-rx pcre flags) t))))
+    (if separator
+        (replace-regexp-in-string "\0" separator elisp)
+      elisp)))
 
 ;;;###autoload
 (defalias 'pcre-to-elisp 'rxt-pcre-to-elisp)
